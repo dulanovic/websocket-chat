@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat soba</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <script>
+            var websocket = new WebSocket("ws://localhost:8080/chat/server");
+            websocket.onmessage = function processMessage(message) {
+                var jsonData = JSON.parse(message.data);
+                if (jsonData.poruka != null) {
+                    if (jsonData.poruka == "poruka> blokiraj") {
+                        document.getElementById("dugme").disabled = true;
+                        return;
+                    }
+                    if (jsonData.poruka == "poruka> odblokiraj") {
+                        document.getElementById("dugme").disabled = false;
+                        return;
+                    }
+                    svePoruke.value += jsonData.poruka + "\n";
+                }
+            };
+
+            function posaljiPoruku() {
+                var poruka = document.getElementById("poruka");
+                websocket.send(poruka.value);
+            }
+        </script>
+
+    </head>
+    <body>
+        <input type="text" id="poruka" size="30" autofocus style="margin-bottom: 10px;">
+        <input type="submit" onclick="posaljiPoruku()" value="Posalji" style="margin-left: 5px;" id="dugme">
+        <p id="ispisKorisnik"></p><br />
+        <textarea id="svePoruke" rows="10" cols="45" readonly></textarea>
+    </body>
+</html>
